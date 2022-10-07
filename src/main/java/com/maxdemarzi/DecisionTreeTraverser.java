@@ -11,6 +11,7 @@ import org.neo4j.procedure.*;
 import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class DecisionTreeTraverser {
 
@@ -29,7 +30,7 @@ public class DecisionTreeTraverser {
     @Description("CALL com.maxdemarzi.traverse.decision_tree(tree, facts) - traverse decision tree")
     public Stream<PathResult> traverseDecisionTree(@Name("tree") String id, @Name("facts") Map<String, String> facts) throws IOException {
         // Which Decision Tree are we interested in?
-        Node tree = db.findNode(Labels.Tree, "id", id);
+        Node tree = db.beginTx().findNode(Labels.Tree, "id", id);
         if ( tree != null) {
             // Find the paths by traversing this graph and the facts given
             return decisionPath(tree, facts);
@@ -38,19 +39,20 @@ public class DecisionTreeTraverser {
     }
 
     private Stream<PathResult> decisionPath(Node tree, Map<String, String> facts) {
-        TraversalDescription myTraversal = db.traversalDescription()
+        TraversalDescription myTraversal = db.beginTx().traversalDescription()
                 .depthFirst()
                 .expand(new DecisionTreeExpander(facts))
                 .evaluator(decisionTreeEvaluator);
 
-        return myTraversal.traverse(tree).stream().map(PathResult::new);
+        return StreamSupport
+                .stream(myTraversal.traverse(tree).spliterator(), false).map(PathResult::new);
     }
 
     @Procedure(name = "com.maxdemarzi.traverse.decision_tree_two", mode = Mode.READ)
     @Description("CALL com.maxdemarzi.traverse.decision_tree_two(tree, facts) - traverse decision tree")
     public Stream<PathResult> traverseDecisionTreeTwo(@Name("tree") String id, @Name("facts") Map<String, String> facts) throws IOException {
         // Which Decision Tree are we interested in?
-        Node tree = db.findNode(Labels.Tree, "id", id);
+        Node tree = db.beginTx().findNode(Labels.Tree, "id", id);
         if ( tree != null) {
             // Find the paths by traversing this graph and the facts given
             return decisionPathTwo(tree, facts);
@@ -59,11 +61,12 @@ public class DecisionTreeTraverser {
     }
 
     private Stream<PathResult> decisionPathTwo(Node tree, Map<String, String> facts) {
-        TraversalDescription myTraversal = db.traversalDescription()
+        TraversalDescription myTraversal = db.beginTx().traversalDescription()
                 .depthFirst()
                 .expand(new DecisionTreeExpanderTwo(facts, log))
                 .evaluator(decisionTreeEvaluator);
 
-        return myTraversal.traverse(tree).stream().map(PathResult::new);
+        return StreamSupport
+                .stream(myTraversal.traverse(tree).spliterator(), false).map(PathResult::new);
     }
 }

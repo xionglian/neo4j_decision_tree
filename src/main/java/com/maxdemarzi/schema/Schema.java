@@ -2,6 +2,7 @@ package com.maxdemarzi.schema;
 
 import com.maxdemarzi.results.StringResult;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.logging.Log;
 import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Description;
@@ -27,7 +28,8 @@ public class Schema {
     @Description("CALL com.maxdemarzi.schema.generate() - generate schema")
 
     public Stream<StringResult> generate() throws IOException {
-        org.neo4j.graphdb.schema.Schema schema = db.schema();
+        Transaction tx = db.beginTx();
+        org.neo4j.graphdb.schema.Schema schema = tx.schema();
         if (!schema.getIndexes(Labels.Tree).iterator().hasNext()) {
             schema.constraintFor(Labels.Tree)
                     .assertPropertyIsUnique("id")
