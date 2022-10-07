@@ -35,7 +35,7 @@ public class DecisionTreeTraverserTest {
 
     private static final Map QUERY1 =
             singletonMap("statements", singletonList(singletonMap("statement",
-                    "CALL com.maxdemarzi.traverse.decision_tree('control match rules', {question:'log retention retain'}) yield path return path")));
+                    "CALL com.maxdemarzi.traverse.decision_tree('control match rules', {question:'logs retention retain usage'}) yield path return path")));
 //            singletonMap("statements", singletonList(singletonMap("statement",
 //                    "CALL com.maxdemarzi.traverse.decision_tree('bar entrance', {gender:'male', age:'20'}) yield path return path")));
 
