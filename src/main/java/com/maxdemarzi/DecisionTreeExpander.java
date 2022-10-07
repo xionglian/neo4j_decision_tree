@@ -63,7 +63,7 @@ public class DecisionTreeExpander implements PathExpander {
     }
 
     private boolean isTrue(Node rule) throws Exception {
-    	    boolean result = true;
+    	    boolean result = false;
     	    try{
 		        Map<String, Object> ruleProperties = rule.getAllProperties();
 		        String words = (String) ruleProperties.get("words");
