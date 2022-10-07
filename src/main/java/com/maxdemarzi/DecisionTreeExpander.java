@@ -7,6 +7,7 @@ import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.traversal.BranchState;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 
 public class DecisionTreeExpander implements PathExpander {
@@ -21,51 +22,73 @@ public class DecisionTreeExpander implements PathExpander {
     @Override
     public Iterable<Relationship> expand(Path path, BranchState branchState) {
         // If we get to an Answer stop traversing, we found a valid path.
-        if (path.endNode().hasLabel(Labels.Answer)) {
-            return Collections.emptyList();
+//        if (path.endNode().hasLabel(Labels.Answer)) {
+//            return Collections.emptyList();
+//        }
+	    System.out.println("xltest0");
+
+//        // If we have Rules to evaluate, go do that.
+        if (!path.endNode().hasRelationship(Direction.OUTGOING, RelationshipTypes.HAS)) {
+	        System.out.println("xltest3");
+	        return Collections.emptyList();
         }
 
-        // If we have Rules to evaluate, go do that.
-        if (path.endNode().hasRelationship(Direction.OUTGOING, RelationshipTypes.HAS)) {
-            return path.endNode().getRelationships(Direction.OUTGOING, RelationshipTypes.HAS);
-        }
-
-        if (path.endNode().hasLabel(Labels.Rule)) {
+//        if (path.endNode().hasLabel(Labels.Rule)) {
             try {
-                if (isTrue(path.endNode())) {
-                    return path.endNode().getRelationships(Direction.OUTGOING, RelationshipTypes.IS_TRUE);
+                if (isTrue(path.endNode()) || path.endNode().hasLabel(Labels.Tree)) {
+                	System.out.println("xltest");
+	                Iterator<Relationship> i = path.endNode().getRelationships(Direction.OUTGOING, RelationshipTypes.HAS).iterator();
+	                while (i.hasNext()){
+		                System.out.println("xltest2");
+		                Map<String, Object> p = i.next().getAllProperties();
+		                for(String key : p.keySet()){
+			                System.out.println(key+":"+p.get(key));
+		                }
+	                }
+                    return path.endNode().getRelationships(Direction.OUTGOING, RelationshipTypes.HAS);
                 } else {
-                    return path.endNode().getRelationships(Direction.OUTGOING, RelationshipTypes.IS_FALSE);
+	                System.out.println("xltest4");
+	                return Collections.emptyList();
                 }
             } catch (Exception e) {
                 // Could not continue this way!
-                return Collections.emptyList();
+	            System.out.println("xltest5");
+
+	            return Collections.emptyList();
             }
-        }
+//        }
 
         // Otherwise, not sure what to do really.
-        return Collections.emptyList();
+//        return Collections.emptyList();
     }
 
     private boolean isTrue(Node rule) throws Exception {
-            // Get the properties of the rule stored in the node
-            Map<String, Object> ruleProperties = rule.getAllProperties();
-            String[] parameterNames = Magic.explode((String) ruleProperties.get("parameter_names"));
-            Class<?>[] parameterTypes = Magic.stringToTypes((String) ruleProperties.get("parameter_types"));
+    	    boolean result = true;
+    	    try{
+		        Map<String, Object> ruleProperties = rule.getAllProperties();
+		        String words = (String) ruleProperties.get("words");
+		        String controls = (String) ruleProperties.get("controls");
+		        String id = (String) ruleProperties.get("id");
+		        String level = (String) ruleProperties.get("level");
+		        System.out.println("question:"+facts.get("question"));
+		        System.out.println("words:"+words);
+		        String question = facts.get("question");
+		        if(null != question && question.length() > 0 && null != words){
+			        for(String word : words.split(",")){
+				        if(question.contains(word)){
+					        result = true;
+					        break;
+				        }
+			        }
+		        }
+	        }catch (Exception e){
 
-            // Fill the arguments array with their corresponding values
-            Object[] arguments = new Object[parameterNames.length];
-            for (int j = 0; j < parameterNames.length; ++j) {
-                arguments[j] = Magic.createObject(parameterTypes[j], facts.get(parameterNames[j]));
-            }
+	        }
 
-            // Set our parameters with their matching types
-            ee.setParameters(parameterNames, parameterTypes);
 
-            // And now we "cook" (scan, parse, compile and load) the expression.
-            ee.cook((String)ruleProperties.get("expression"));
 
-            return (boolean) ee.evaluate(arguments);
+
+	    return result;
     }
 
     @Override

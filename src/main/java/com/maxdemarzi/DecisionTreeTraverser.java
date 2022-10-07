@@ -24,7 +24,7 @@ public class DecisionTreeTraverser {
     @Context
     public Log log;
 
-    private static final DecisionTreeEvaluator decisionTreeEvaluator = new DecisionTreeEvaluator();
+//    private static final DecisionTreeEvaluator decisionTreeEvaluator = new DecisionTreeEvaluator();
 
     @Procedure(name = "com.maxdemarzi.traverse.decision_tree", mode = Mode.READ)
     @Description("CALL com.maxdemarzi.traverse.decision_tree(tree, facts) - traverse decision tree")
@@ -33,6 +33,7 @@ public class DecisionTreeTraverser {
         Node tree = db.beginTx().findNode(Labels.Tree, "id", id);
         if ( tree != null) {
             // Find the paths by traversing this graph and the facts given
+            System.out.println("test");
             return decisionPath(tree, facts);
         }
         return null;
@@ -42,7 +43,7 @@ public class DecisionTreeTraverser {
         TraversalDescription myTraversal = db.beginTx().traversalDescription()
                 .depthFirst()
                 .expand(new DecisionTreeExpander(facts))
-                .evaluator(decisionTreeEvaluator);
+                .evaluator(new DecisionTreeEvaluator(facts));
 
         return StreamSupport
                 .stream(myTraversal.traverse(tree).spliterator(), false).map(PathResult::new);
@@ -64,7 +65,7 @@ public class DecisionTreeTraverser {
         TraversalDescription myTraversal = db.beginTx().traversalDescription()
                 .depthFirst()
                 .expand(new DecisionTreeExpanderTwo(facts, log))
-                .evaluator(decisionTreeEvaluator);
+                .evaluator(new DecisionTreeEvaluator(facts));
 
         return StreamSupport
                 .stream(myTraversal.traverse(tree).spliterator(), false).map(PathResult::new);
