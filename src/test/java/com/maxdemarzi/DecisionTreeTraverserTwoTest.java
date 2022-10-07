@@ -1,5 +1,6 @@
 package com.maxdemarzi;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,8 +40,8 @@ public class DecisionTreeTraverserTwoTest {
         HTTP.Response response = HTTP.POST(neo4j.httpURI().resolve("/db/data/transaction/commit").toString(), QUERY2);
         int count = response.get("results").get(0).get("data").size();
         assertEquals(1, count);
-        ArrayList<Map> path1 = mapper.convertValue(response.get("results").get(0).get("data").get(0).get("row").get(0), ArrayList.class);
-        assertEquals("unknown", path1.get(path1.size() - 1).get("id"));
+        JsonNode path1 = response.get("results").get(0).get("data").get(0).get("row").get(0);
+        assertEquals("unknown", path1.get(path1.size() - 1).get("id").asText());
     }
 
     private static final Map QUERY2 =
@@ -52,8 +53,8 @@ public class DecisionTreeTraverserTwoTest {
         HTTP.Response response = HTTP.POST(neo4j.httpURI().resolve("/db/data/transaction/commit").toString(), QUERY3);
         int count = response.get("results").get(0).get("data").size();
         assertEquals(1, count);
-        ArrayList<Map> path1 = mapper.convertValue(response.get("results").get(0).get("data").get(0).get("row").get(0), ArrayList.class);
-        assertEquals("correct", path1.get(path1.size() - 1).get("id"));
+        JsonNode path1 = response.get("results").get(0).get("data").get(0).get("row").get(0);
+        assertEquals("correct", path1.get(path1.size() - 1).get("id").asText());
     }
 
     private static final Map QUERY3 =
