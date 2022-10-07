@@ -54,8 +54,8 @@ public class DecisionTreeTraverserTest {
         HTTP.Response response = HTTP.POST(neo4j.httpURI().resolve("/db/data/transaction/commit").toString(), QUERY3);
         int count = response.get("results").get(0).get("data").size();
         assertEquals(1, count);
-        ArrayList<Map> path1 = mapper.convertValue(response.get("results").get(0).get("data").get(0).get("row").get(0), ArrayList.class);
-        assertEquals("yes", path1.get(path1.size() - 1).get("id"));
+        JsonNode path1 = response.get("results").get(0).get("data").get(0).get("row").get(0);
+        assertEquals("yes", path1.get(path1.size() - 1).get("id").asText());
     }
 
     private static final Map QUERY3 =
