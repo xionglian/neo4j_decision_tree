@@ -25,38 +25,38 @@ public class DecisionTreeExpander implements PathExpander {
 //        if (path.endNode().hasLabel(Labels.Answer)) {
 //            return Collections.emptyList();
 //        }
-	    System.out.println("xltest0");
+	    System.out.println("========in expand===========");
+	    Iterable<Relationship> result = Collections.emptyList();
+	    System.out.println("path:"+path.toString());
 
 //        // If we have Rules to evaluate, go do that.
         if (!path.endNode().hasRelationship(Direction.OUTGOING, RelationshipTypes.HAS)) {
-	        System.out.println("xltest3");
-	        return Collections.emptyList();
+	        System.out.println("has no relationship");
+	        return result;
         }
-
-//        if (path.endNode().hasLabel(Labels.Rule)) {
-            try {
+         try {
                 if (isTrue(path.endNode()) || path.endNode().hasLabel(Labels.Tree)) {
-                	System.out.println("xltest");
+                	System.out.println("isTrue || label is tree");
 	                Iterator<Relationship> i = path.endNode().getRelationships(Direction.OUTGOING, RelationshipTypes.HAS).iterator();
 	                while (i.hasNext()){
-		                System.out.println("xltest2");
 		                Map<String, Object> p = i.next().getAllProperties();
 		                for(String key : p.keySet()){
 			                System.out.println(key+":"+p.get(key));
 		                }
 	                }
-                    return path.endNode().getRelationships(Direction.OUTGOING, RelationshipTypes.HAS);
+                    result = path.endNode().getRelationships(Direction.OUTGOING, RelationshipTypes.HAS);
                 } else {
-	                System.out.println("xltest4");
-	                return Collections.emptyList();
+	                System.out.println("other");
+	                result = Collections.emptyList();
                 }
             } catch (Exception e) {
                 // Could not continue this way!
-	            System.out.println("xltest5");
-
-	            return Collections.emptyList();
+	            System.out.println("exception");
+	            result = Collections.emptyList();
             }
 //        }
+	    System.out.println("========out expand===========");
+	    return result;
 
         // Otherwise, not sure what to do really.
 //        return Collections.emptyList();
@@ -67,15 +67,12 @@ public class DecisionTreeExpander implements PathExpander {
     	    try{
 		        Map<String, Object> ruleProperties = rule.getAllProperties();
 		        String words = (String) ruleProperties.get("words");
-		        String controls = (String) ruleProperties.get("controls");
-		        String id = (String) ruleProperties.get("id");
-		        String level = (String) ruleProperties.get("level");
 		        System.out.println("question:"+facts.get("question"));
 		        System.out.println("words:"+words);
 		        String question = facts.get("question");
 		        if(null != question && question.length() > 0 && null != words){
 			        for(String word : words.split(",")){
-				        if(question.contains(word)){
+				        if(question.contains(word.trim())){
 					        result = true;
 					        break;
 				        }
