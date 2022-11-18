@@ -8,6 +8,7 @@ import org.neo4j.graphdb.traversal.BranchState;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class DecisionTreeExpander implements PathExpander {
@@ -66,13 +67,13 @@ public class DecisionTreeExpander implements PathExpander {
     	    boolean result = false;
     	    try{
 		        Map<String, Object> ruleProperties = rule.getAllProperties();
-		        String words = (String) ruleProperties.get("words");
+		        List<String> words = (List<String>) ruleProperties.get("words");
 		        System.out.println("question:"+facts.get("question"));
 		        System.out.println("words:"+words);
 		        String question = facts.get("question");
 		        if(null != question && question.length() > 0 && null != words){
-			        for(String word : words.split(",")){
-				        if(question.contains(word.trim())){
+			        for(String word : words){
+				        if(question.contains(word)){
 					        result = true;
 					        break;
 				        }

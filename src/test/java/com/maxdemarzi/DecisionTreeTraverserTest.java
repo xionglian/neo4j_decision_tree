@@ -29,13 +29,20 @@ public class DecisionTreeTraverserTest {
         System.out.println(response.get("results"));
         int count = response.get("results").get(0).get("data").size();
 //        assertEquals(1, count);
-        JsonNode path1 = response.get("results").get(0).get("data").get(0).get("row").get(0);
+        JsonNode data = response.get("results").get(0).get("data");
+        for(JsonNode path : data){
+            JsonNode path1 = path.get("row").get(0).get(path.get("row").get(0).size() - 1);
+            System.out.println(path1);
+
+        }
+//        JsonNode path1 = response.get("results").get(0).get("data").get(0).get("row").get(0);
+
 //        assertEquals("no", path1.get(path1.size() - 1).get("id").asText());
     }
 
     private static final Map QUERY1 =
             singletonMap("statements", singletonList(singletonMap("statement",
-                    "CALL com.maxdemarzi.traverse.decision_tree('control match rules', {question:'logs retention retain usage'}) yield path return path")));
+                    "CALL com.maxdemarzi.traverse.decision_tree('control match rules', {question:'log'}) yield path return path")));
 //            singletonMap("statements", singletonList(singletonMap("statement",
 //                    "CALL com.maxdemarzi.traverse.decision_tree('bar entrance', {gender:'male', age:'20'}) yield path return path")));
 

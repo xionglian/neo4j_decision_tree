@@ -11,6 +11,7 @@ import org.neo4j.graphdb.traversal.Evaluation;
 import org.neo4j.graphdb.traversal.PathEvaluator;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class DecisionTreeEvaluator implements PathEvaluator {
@@ -62,16 +63,13 @@ public class DecisionTreeEvaluator implements PathEvaluator {
         boolean result = false;
         try{
             Map<String, Object> ruleProperties = rule.getAllProperties();
-//            for(String key : ruleProperties.keySet()){
-//                System.out.println(key+":"+ruleProperties.get(key));
-//            }
-            String words = (String) ruleProperties.get("words");
+            List<String> words = (List<String>) ruleProperties.get("words");
             System.out.println("question:"+facts.get("question"));
             System.out.println("words:"+words);
             String question = facts.get("question");
             if(null != question && question.length() > 0 && null != words){
-                for(String word : words.split(",")){
-                    if(question.contains(word.trim())){
+                for(String word : words){
+                    if(question.contains(word)){
                         result = true;
                         break;
                     }
